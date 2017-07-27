@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         goster();
     }
 
+
+
     public void goster() {
         btnBilgi.setOnClickListener(new View.OnClickListener() {
             @Override
