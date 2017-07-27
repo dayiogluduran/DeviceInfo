@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.durandayioglu.deviceinfos.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtImsi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="IMSI : "
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtICCD"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ICCD : "
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtImei"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="IMEI : "
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtApn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="APN :"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtSignal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sinyal Seviyesi : "
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtBattery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Batarya Seviyesi :"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Konum : "
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Açık Kalma Süresi :"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtDeviceName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cihaz :"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtOs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Android Sürümü :"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtCpu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cpu : "
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <Button
+            android:id="@+id/btnGoster"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bilgileri Göster" />
+
+    </LinearLayout>
+
+</RelativeLayout>
