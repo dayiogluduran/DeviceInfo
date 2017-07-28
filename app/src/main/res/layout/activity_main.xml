@@ -112,6 +112,12 @@
             android:layout_height="wrap_content"
             android:text="Bilgileri Göster" />
 
+        <Button
+            android:id="@+id/btnYaz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dosyaya Yaz" />
+
     </LinearLayout>
 
 </RelativeLayout>
