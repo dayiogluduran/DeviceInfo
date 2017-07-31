@@ -103,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
         int days = (int) ((milliseconds / (1000 * 60 * 60 * 24)));
 
         String time;
-        if (days>0) {
-            time=days+"gün "+hours + "saat " + minutes + "dk " + seconds + "sn";;
+        if (days > 0) {
+            time = days + "gün " + hours + "saat " + minutes + "dk " + seconds + "sn";
         } else if (hours > 0 && minutes > 0) {
             time = hours + "saat " + minutes + "dk " + seconds + "sn";
         } else if (hours == 0 && minutes > 0) {
