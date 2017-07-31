@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Parcelable;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             getDeviceInfo();
         }
 
+
         konumAl();
 
 
@@ -88,11 +91,32 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(this.batteryInfo, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
 
-
-
-
         goster();
         dosyayaKaydet();
+    }
+
+    private String milisToHour(long milliseconds) {
+
+        int seconds = (int) (milliseconds / 1000) % 60;
+        int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
+        int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+        int days = (int) ((milliseconds / (1000 * 60 * 60 * 24)));
+
+        String time;
+        if (days>0) {
+            time=days+"gün "+hours + "saat " + minutes + "dk " + seconds + "sn";;
+        } else if (hours > 0 && minutes > 0) {
+            time = hours + "saat " + minutes + "dk " + seconds + "sn";
+        } else if (hours == 0 && minutes > 0) {
+            time = minutes + "dk " + seconds + "sn";
+        } else if (hours == 0 && minutes == 0) {
+            time = "Cihaz daha yeni açıldı";
+        } else {
+            time = "HATA ! ";
+        }
+
+        return time;
+
     }
 
 
@@ -105,11 +129,13 @@ public class MainActivity extends AppCompatActivity {
 
                 //upTime
                 long miliss = android.os.SystemClock.elapsedRealtime();
-                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", new Locale("tr-TR"));
+               /* SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", new Locale("tr-TR"));
                 formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Date date = new Date(miliss);
                 String result = formatter.format(date);
-                acikOlanSure = result;
+                acikOlanSure = result;*/
+                acikOlanSure = milisToHour(miliss);
+
 
                 txtImsi.setText("IMSI : " + imsi);
                 txtImei.setText("IMEI : " + imei);
@@ -126,11 +152,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void signalLevel(){
+    public void signalLevel() {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         List<CellInfo> all = tm.getAllCellInfo();
         String a = all.get(0).getClass().getName();
 
+      /*  if (isAirplaneModeOn(this) == true) {*/
         if (a.equals("android.telephony.CellInfoLte")) {
             CellInfoLte cellInfoLte = (CellInfoLte) all.get(0);
             CellSignalStrengthLte cellSignalStrengthLte = cellInfoLte.getCellSignalStrength();
@@ -145,6 +172,9 @@ public class MainActivity extends AppCompatActivity {
             CellSignalStrengthGsm cellSignalStrengthGsm = cellInfoGsm.getCellSignalStrength();
             signal = String.valueOf(cellSignalStrengthGsm.getDbm() + " dB");
         }
+       /* } else {
+            signal="Airplane Mode On";
+        }*/
     }
 
 
