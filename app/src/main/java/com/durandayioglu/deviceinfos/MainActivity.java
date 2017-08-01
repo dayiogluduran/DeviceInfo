@@ -6,16 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
-import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.CellInfo;
@@ -25,8 +23,6 @@ import android.telephony.CellInfoWcdma;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthWcdma;
-import android.telephony.PhoneStateListener;
-import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
@@ -36,12 +32,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     String dosyayaYazilacak;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    long miliss;
 
 
     @Override
@@ -76,23 +69,66 @@ public class MainActivity extends AppCompatActivity {
         btnBilgi = (Button) findViewById(R.id.btnGoster);
         btnYaz = (Button) findViewById(R.id.btnYaz);
 
-
-        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
-        } else {
-            getDeviceInfo();
-        }
-
-
-        konumAl();
-
+        IzinKontroEt();
 
         //Battery
         this.registerReceiver(this.batteryInfo, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-
-
+        konumAl();
         goster();
         dosyayaKaydet();
+    }
+
+    private void IzinKontroEt() {
+        String[] izinler = {
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET,
+                Manifest.permission.READ_PHONE_STATE
+        };
+        int phoneStateCode = 02;
+        int locCode = 03;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                getDeviceInfo();
+            } else {
+                requestPermissions(izinler, phoneStateCode);
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                konumAl();
+                locationManager.requestLocationUpdates("gps", 5000, 5, locationListener);
+            } else {
+                requestPermissions(izinler, locCode);
+            }
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 02: {
+                //-- Kullanıcı izin isteğini iptal ederse if - else bloğunun içindeki kodlar çalışmayacaktır. Böyle bir durumda yapılacak işlemleri bu kısımda kodlayabilirsiniz.
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getDeviceInfo();
+                } else {
+                    //-- Kullanıcı istemiş olduğunuz izni reddederse bu kod bloğu çalışacaktır.
+                }
+                return;
+            }
+            case 03: {
+                //-- Kullanıcı izin isteğini iptal ederse if - else bloğunun içindeki kodlar çalışmayacaktır. Böyle bir durumda yapılacak işlemleri bu kısımda kodlayabilirsiniz.
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    konumAl();
+                    locationManager.requestLocationUpdates("gps", 5000, 5, locationListener);
+                } else {
+                    //-- Kullanıcı istemiş olduğunuz izni reddederse bu kod bloğu çalışacaktır.
+                }
+                return;
+            }
+            //-- Farklı 'case' blokları ekleyerek diğer izin işlemlerinizin sonuçlarını da kontrol edebilirsiniz.. Biz burada sadece değerini 67 olarak tanımladığımız izin işlemini kontrol ettik.
+        }
     }
 
     private String milisToHour(long milliseconds) {
@@ -114,9 +150,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             time = "HATA ! ";
         }
-
         return time;
-
     }
 
 
@@ -126,16 +160,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 signalLevel();
+                getDeviceInfo();
+                konumAl();
 
                 //upTime
-                long miliss = android.os.SystemClock.elapsedRealtime();
-               /* SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", new Locale("tr-TR"));
-                formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-                Date date = new Date(miliss);
-                String result = formatter.format(date);
-                acikOlanSure = result;*/
+                miliss = android.os.SystemClock.elapsedRealtime();
                 acikOlanSure = milisToHour(miliss);
-
 
                 txtImsi.setText("IMSI : " + imsi);
                 txtImei.setText("IMEI : " + imei);
@@ -157,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
         List<CellInfo> all = tm.getAllCellInfo();
         String a = all.get(0).getClass().getName();
 
-      /*  if (isAirplaneModeOn(this) == true) {*/
         if (a.equals("android.telephony.CellInfoLte")) {
             CellInfoLte cellInfoLte = (CellInfoLte) all.get(0);
             CellSignalStrengthLte cellSignalStrengthLte = cellInfoLte.getCellSignalStrength();
@@ -172,9 +201,6 @@ public class MainActivity extends AppCompatActivity {
             CellSignalStrengthGsm cellSignalStrengthGsm = cellInfoGsm.getCellSignalStrength();
             signal = String.valueOf(cellSignalStrengthGsm.getDbm() + " dB");
         }
-       /* } else {
-            signal="Airplane Mode On";
-        }*/
     }
 
 
@@ -210,31 +236,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
+
+
         };
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET
-                }, 10);
-                return;
-            }
-        } else {
-            locationManager.requestLocationUpdates("gps", 5000, 5, locationListener);
-        }
-        locationManager.requestLocationUpdates("gps", 5000, 5, locationListener);
     }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
-        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            getDeviceInfo();
-        } else if (requestCode == 10 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates("gps", 5000, 5, locationListener);
-        }
-    }
 
     public void getDeviceInfo() {
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -244,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
         os = Build.VERSION.RELEASE + " - " + "Api : " + Build.VERSION.SDK_INT;
         aygitAdi = Build.MANUFACTURER + " - " + Build.MODEL;
         cpu = Build.CPU_ABI;
+        apn = telephonyManager.getNetworkOperatorName();
     }
 
     private BroadcastReceiver batteryInfo = new BroadcastReceiver() {
