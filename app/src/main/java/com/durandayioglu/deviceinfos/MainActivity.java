@@ -219,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
                 konum = location.getLatitude() + " - " + location.getLongitude();
+
             }
 
             @Override
